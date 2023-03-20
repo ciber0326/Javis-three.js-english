@@ -84,6 +84,16 @@ input[type="password"] {
   font-weight: bold;
   padding-left: 180px;
 }
+@media only screen and (max-width: 767px) {
+  /* スマートフォンサイズになった場合のスタイルを指定 */
+  .header {
+    text-align: left;
+    padding-left: 30px;
+  }
+}
+.header .desc {
+  font-size: 18px;
+}
 
 .messages {
   flex-grow: 1;
@@ -133,4 +143,52 @@ input[type="password"] {
 
 .theirs {
   margin-right: auto;
+}
+
+.nowspeaking {
+  position: fixed;
+  z-index: 999;
+  bottom: 10px;
+  right: 10px;
+}
+
+.nowspeaking .text {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #202020;
+  color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  max-width: 70vw;
+}
+
+.reload {
+  padding: 0px 4px;
+  cursor: pointer;
+}
+
+.chatthinking {
+  position: fixed;
+  z-index: 999;
+  bottom: 50px;
+  left: 10px;
+}
+.chatthinking .suspend {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #0f81dfa6;
+  color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  max-width: 70vw;
+  font-weight: bold;
+  opacity: 0.8;
+  animation: fade-in-out 1s ease-in-out infinite alternate;
+}
+
+
+
+@keyframes fade-in-out {
+  from { opacity: 0.2; }
+  to { opacity: 1.0; }
 }

@@ -45,7 +45,7 @@ declare var webkitSpeechRecognition: any;
 
 interface IUseSpeechRecognition {
   enabled: boolean;
-  lang: "ja" | "en";
+  lang: "ja-JP" | "en-US";
   continuous: boolean; // 連続的に音声認識
   interimResults: boolean; // 途中結果の出力
 }
@@ -65,7 +65,6 @@ export const useSpeechRecognition = (props: IUseSpeechRecognition): ISpeechRecog
     finishText: '',
     interimText: ''
   });
-  const [text, setText] = useState<string>();
   window.SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
   var recognition: ISpeechRecognition = new webkitSpeechRecognition();
   recognition.lang = props.lang;
@@ -105,7 +104,10 @@ export const useSpeechRecognition = (props: IUseSpeechRecognition): ISpeechRecog
   }
 
   const stopRecognition = () => {
-    recognition.stop();
+    try {
+      recognition.stop();
+    }
+    catch(e){}
   };
 
   useEffect(() => {
@@ -115,7 +117,10 @@ export const useSpeechRecognition = (props: IUseSpeechRecognition): ISpeechRecog
     else {
       stopRecognition();
     }
-  }, [props.enabled]);
+    return (() => {
+      stopRecognition();
+    })
+  }, [props.enabled, props.lang]);
 
   return ref.current;
 }

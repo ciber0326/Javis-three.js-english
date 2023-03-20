@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import './App.css';
 import { useSpeechRecognition } from './services/SpeechRecognitionHelper';
 import { BsFillMicFill, BsFillMicMuteFill } from "react-icons/bs";
-import { AiOutlineQuestionCircle, AiFillSave } from "react-icons/ai";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
+import { AiOutlineQuestionCircle, AiFillSave, AiOutlineReload } from "react-icons/ai";
 import { requestChatGPT } from './services/chatBotApi';
 import Swal from "sweetalert2";
 import { playTextToSpeech } from './services/TextToSpeechHelper';
@@ -10,26 +11,28 @@ import { playTextToSpeech } from './services/TextToSpeechHelper';
 function App() {
   const apiKey = useRef<string>(null);
   const [enabled, setEnbled] = useState<boolean>(false);
-  const [lang, setLang] = useState<"en" | "ja">("en");
+  const [reload, setReload] = useState<number>(0);
+  const [lang, setLang] = useState<"en-US" | "ja-JP">("en-US");
   const speechText = useSpeechRecognition({ enabled: enabled, lang: lang, continuous: true, interimResults: true });
   const ref = useRef<HTMLDivElement>();
-  const inputRef = useRef<HTMLInputElement>();
   const volumeRef = useRef<number>(0.6);
   const pitchRef = useRef<number>(1.0);
   const speedRef = useRef<number>(1.0);
   const suspendRef = useRef<boolean>(false);
 
+  const _apiKey = localStorage.getItem("OPENAI_API_KEY");
+  if (_apiKey){
+    apiKey.current = _apiKey;
+  }
+
   useEffect(() => {
-    const _apiKey = localStorage.getItem("OPENAI_API_KEY");
-    if (_apiKey){
-      apiKey.current = _apiKey;
-      inputRef.current.value = _apiKey;
-    }
     const interval = setInterval(() => {
       frameLoop();
-    }, 1000 / 5);
+    }, 1000 / 10);
+    const suspend = document.getElementById("suspend");
+    suspend.style.display = "none";
     return () => clearInterval(interval);
-  }, []);
+  }, [enabled, reload]);
 
   const appendChatBoxText = async () => {
     if (!suspendRef.current){
@@ -42,11 +45,15 @@ function App() {
             + '入手後その値を"OpeAIのAPIキーをここに入力してください"と記述されたところ貼り付けてください。',
           imageUrl: 'description-openai-key.jpg',
           imageHeight: 200,
-          imageAlt: 'A tall image',
+          imageAlt: 'Image',
         })
         return;
       }
+      const suspend = document.getElementById("suspend");
+      suspend.style.display = "block";
       const chatbotText = await requestChatGPT({ text: speechText.finishText, apiKey: apiKey.current });
+      suspendRef.current = false;
+      suspend.style.display = "none";
       playTextToSpeech({ 
         text: chatbotText, 
         lang: "Auto",
@@ -59,7 +66,6 @@ function App() {
       newElement.textContent = chatbotText;
       ref.current.appendChild(newElement);
       ref.current.scrollTop = ref.current.scrollHeight;
-      suspendRef.current = false;
     }
   }
 
@@ -73,6 +79,10 @@ function App() {
   }
 
   const frameLoop = () => {
+    if (speechText.interimText.length > 0){
+      const text = document.getElementById("text");
+      text.innerText = speechText.interimText;
+    }
     if (ref.current){
       const lastChild = ref.current.lastElementChild;
       // console.log(lastChild);
@@ -108,7 +118,7 @@ function App() {
           + '入手後その値を"OpeAIのAPIキーをここに入力してください"と記述されたところ貼り付けてください。',
         imageUrl: 'description-openai-key.jpg',
         imageHeight: 200,
-        imageAlt: 'A tall image',
+        imageAlt: 'Image',
       })
       return;
     }
@@ -116,11 +126,11 @@ function App() {
   }
 
   const changeLang = () => {
-    if (lang == "en"){
-      setLang("ja");
+    if (lang == "en-US"){
+      setLang("ja-JP");
     }
-    else if (lang == "ja"){
-      setLang("en");
+    else if (lang == "ja-JP"){
+      setLang("en-US");
     }
   } 
 
@@ -142,12 +152,18 @@ function App() {
       confirmButtonText: 'する',
       denyButtonText: `しない`,
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         localStorage.setItem("OPENAI_API_KEY", apiKey.current);
         Swal.fire('保持しました!', '', 'success')
       }
     })
+  }
+
+  const startReload = () => {
+    suspendRef.current = false;
+    const suspend = document.getElementById("suspend");
+    suspend.style.display = "none";
+    setReload(reload + 1);
   }
 
   return (
@@ -157,7 +173,7 @@ function App() {
             <div className="chatroom">
               <div className="header">
                 AI英会話
-                <a className="icon" onClick={() => {openLinkDesciption()}}>
+                <a className="icon desc" onClick={() => {openLinkDesciption()}}>
                   <AiOutlineQuestionCircle/>
                 </a>
                 <a className="icon mic" onClick={() => startSpeech()}>
@@ -172,7 +188,6 @@ function App() {
               </div>
               <div className="keyinput">
                 <input 
-                  ref={inputRef}
                   className='input'
                   type="password" 
                   placeholder='OpenAIのAPIキーをここに入力してください。' 
@@ -197,11 +212,52 @@ function App() {
                   </div>
                 </div>
               </div>
+              <div className='chatthinking'>
+                <div id="suspend" className="suspend">
+                  回答を作成しています<BiDotsHorizontalRounded/>
+                </div>
+              </div>
+              <div className='nowspeaking'>
+                <div className="text">
+                  <a className="reload" onClick={() => {startReload()}}><AiOutlineReload/></a>
+                  <span id="text"></span>
+                </div>
+              </div>
             </div>
         </div>
         </>
     </div>
   );
 }
+
+const synth = window.speechSynthesis;
+const VoiceSelector = ({ selected = 0, setSelected }) => {
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  const populateVoiceList = useCallback(() => {
+    const newVoices = synth.getVoices();
+    setVoices(newVoices);
+  }, []);
+
+  useEffect(() => {
+    populateVoiceList();
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = populateVoiceList;
+    }
+  }, [populateVoiceList]);
+
+  return (
+    <select
+      value={selected}
+      onChange={(e) => setSelected(parseInt(e.target.value))}
+    >
+      {voices.map((voice, index) => (
+        <option key={index} value={index}>
+          {voice.name} ({voice.lang}) {voice.default && ' [Default]'}
+        </option>
+      ))}
+    </select>
+  );
+};
 
 export default App;

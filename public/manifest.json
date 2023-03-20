@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "AI英会話",
+  "name": "AIと英会話するだけのアプリ",
   "icons": [
     {
       "src": "favicon.ico",
