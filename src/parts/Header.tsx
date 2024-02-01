@@ -35,62 +35,6 @@ export const Header = () => {
 
   return (
     <Animator>
-      {/* <Animator merge combine manager='stagger'> */}
-      {/* <Animator active={active}>
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              height: 75,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                width: "100%",
-                height: 75,
-                top: 0,
-                left: 0,
-                zIndex: 1,
-              }}
-            >
-              <div>
-                AI英会話
-                <a
-                  className="icon desc"
-                  onClick={() => {
-                    openLinkDesciption();
-                  }}
-                >
-                  <AiOutlineQuestionCircle />
-                </a>
-                <a className="icon mic" onClick={() => startSpeech()}>
-                  {user.mic ? <BsFillMicFill /> : <BsFillMicMuteFill />}
-                </a>
-                <a className="icon lang" onClick={() => changeLang()}>
-                  言語({user.language})
-                </a>
-              </div>
-              <div className="keyinput">
-                <input
-                  className="input"
-                  type="password"
-                  placeholder="OpenAIのAPIキーをここに入力してください。"
-                  value={user.openaiApiKey}
-                  onChange={(e) => {
-                    user.setOpenaiApiKey(e.target.value);
-                  }}
-                />
-                <a
-                  className="save"
-                  onClick={() => user.saveLocalStorageKey(user.openaiApiKey)}
-                >
-                  <AiFillSave />
-                </a>
-              </div>
-            </div>
-          </div>
-        </Animator> */}
       <BleepsOnAnimator transitions={{ entering: "intro" }} continuous />
       <Animated
         className="card"
