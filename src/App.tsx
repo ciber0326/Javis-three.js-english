@@ -8,7 +8,7 @@ import { requestChatGPT } from './services/chatBotApi';
 import Swal from "sweetalert2";
 import { playTextToSpeech } from './services/TextToSpeechHelper';
 
-function App() {
+export const App = () => {
   const apiKey = useRef<string>(null);
   const [enabled, setEnbled] = useState<boolean>(false);
   const [reload, setReload] = useState<number>(0);
@@ -259,5 +259,3 @@ const VoiceSelector = ({ selected = 0, setSelected }) => {
     </select>
   );
 };
-
-export default App;
