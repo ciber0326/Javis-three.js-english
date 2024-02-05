@@ -48,6 +48,21 @@ const useUserStore = create<UserStore>((set) => ({
   },
 }));
 
+/**
+ * 共通モーダルのON/OFF設定
+ */
+type ModalStore = {
+  modal: boolean;
+  setModal: (modal: boolean) => void;
+  openModal: () => void;
+  hiddenModal: () => void;
+};
+const useModalStore = create<ModalStore>((set) => ({
+  modal: false,
+  setModal: (modal) => set({ modal }),
+  openModal: () => set({ modal: true }),
+  hiddenModal: () => set({ modal: false }),
+}));
 
 /**
  * カラーリング設定
@@ -94,4 +109,4 @@ const useMessageStore = create<MessageStore>((set) => ({
   removeAllMessages: () => set({ messages: [] }),
 }));
 
-export { useUserStore, useColorStore, useMessageStore };
+export { useUserStore, useModalStore, useColorStore, useMessageStore };

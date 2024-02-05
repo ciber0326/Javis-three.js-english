@@ -10,7 +10,7 @@ import {
   aa,
   createAppTheme,
 } from "@arwes/react";
-import { AiOutlineQuestionCircle, AiFillSave } from "react-icons/ai";
+import { FaKey } from "react-icons/fa";
 import { BsFillMicFill, BsFillMicMuteFill } from "react-icons/bs";
 import { useColorStore, useUserStore } from "../store";
 import { useTalk } from "../providers/TalkProvider";
@@ -21,6 +21,7 @@ export const Header = () => {
   const [active, setActive] = useState(false);
   const user = useUserStore();
   const { color, foreColor } = useColorStore();
+  const [open, setOpen] = useState(false);
   const bleeps = useBleeps();
 
   const { openLinkDesciption, startSpeech } = useTalk();
@@ -72,7 +73,7 @@ export const Header = () => {
           style={{
             position: "absolute",
             top: "24px",
-            right: "24px",
+            right: "56px",
             fontSize: "20px",
             zIndex: 1,
             cursor: "pointer",
@@ -86,7 +87,7 @@ export const Header = () => {
           style={{
             position: "absolute",
             top: "24px",
-            right: "56px",
+            right: "84px",
             zIndex: 1,
             cursor: "pointer",
           }}
@@ -95,17 +96,43 @@ export const Header = () => {
             {user.language === "en-US" ? "JP" : "US"}
           </a>
         </div>
-        <div>
+        <div
+          style={{
+            position: "absolute",
+            top: "24px",
+            right: "24px",
+            fontSize: "20px",
+            zIndex: 1,
+            cursor: "pointer",
+          }}
+        >
+          <a onClick={() => setOpen(!open)}>
+            <FaKey />
+          </a>
+        </div>
+      </Animated>
+      <Animator active={open} duration={{ enter: 0.75 }}>
+        {open && (
           <input
             type="password"
             placeholder="OpenAIのAPIキーをここに入力してください。"
             value={user.openaiApiKey}
             onChange={(e) => {
               user.setOpenaiApiKey(e.target.value);
+              // 音も鳴らす
+              bleeps.click?.play();
+            }}
+            style={{
+              backgroundColor: foreColor,
+              position: "absolute",
+              top: "85px",
+              zIndex: 2,
+              // width: "90%",
+              // margin: "0 auto",
             }}
           />
-        </div>
-      </Animated>
+        )}
+      </Animator>
       {/* </Animator> */}
     </Animator>
   );
