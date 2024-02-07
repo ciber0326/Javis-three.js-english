@@ -85,6 +85,7 @@ const useColorStore = create<ColorStore>((set) => ({
  */
 export type MessageProps = {
   id: string;
+  role: "user" | "assistant";
   message: string;
   username?: string;
   avatar?: string;
@@ -97,7 +98,26 @@ type MessageStore = {
   removeAllMessages: () => void;
 };
 const useMessageStore = create<MessageStore>((set) => ({
-  messages: [],
+  messages: [
+    {
+      id: "1",
+      role: "user",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "2",
+      role: "user",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "3",
+      role: "assistant",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+  ],
   addMessage: (message) =>
     set((state) => ({
       messages: [...state.messages, message],

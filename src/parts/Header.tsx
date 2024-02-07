@@ -67,7 +67,7 @@ export const Header = () => {
           <FrameSVGCorners strokeWidth={2} />
         </Animator>
 
-        <Text as="h2">English Lesson</Text>
+        <Text as="h2" className="italic">JARVIS English</Text>
 
         <div
           style={{
