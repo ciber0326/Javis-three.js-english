@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/foasho/english-lesson/assets/57359515/b729e014-d03a-4ee6-9095-ed00b576ece9" width="300" />
+<img src="https://github.com/foasho/english-lesson/assets/57359515/12d9d30f-7471-4e13-98c4-774941c99f6e" width="500" />
 
 # JARVIS 英会話アプリ
 
