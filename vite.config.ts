@@ -1,11 +1,14 @@
 import { defineConfig } from "vite";
 import glsl from "vite-plugin-glsl";
+// import react from "@vitejs/plugin-react";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     VitePWA(),
+    // @ts-ignore
+    // react({ fastRefresh: false }),
     react(),
     glsl({
       include: [
@@ -24,6 +27,9 @@ export default defineConfig({
       root: "/", // Directory for root imports
     }),
   ],
+  worker: {
+    plugins: [react()],
+  },
   define: {
     "process.env": process.env,
   },

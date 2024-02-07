@@ -28,15 +28,15 @@ type ModalProps = {
   open: boolean;
   children?: React.ReactNode;
   title?: string;
-  confirmText: string;
-  cancelText: string;
+  confirmText?: string;
+  cancelText?: string;
 };
 const Modal = ({
   open,
   children,
   title,
-  confirmText,
-  cancelText,
+  confirmText="OK",
+  cancelText="Cancel",
 }: ModalProps) => {
   const { color, foreColor } = useColorStore();
   const { hiddenModal } = useModalStore();
@@ -78,10 +78,12 @@ const Modal = ({
               ></FrameSVGKranox>
 
               <div className="px-12 pt-6">
-                <Text as="h2" manager="decipher" easing="outSine" fixed>
-                  {title}
-                </Text>
-                {typeof children === "string" ? (
+                {title &&
+                  <Text as="h2" manager="decipher" easing="outSine" fixed>
+                    {title}
+                  </Text>
+                }
+                {children && typeof children === "string" ? (
                   <Text as="p" manager="decipher" easing="outSine" fixed>
                     {children}
                   </Text>

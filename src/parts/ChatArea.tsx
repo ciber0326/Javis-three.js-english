@@ -1,17 +1,14 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useUserStore } from "../store";
-
-import { BiDotsHorizontalRounded } from "react-icons/bi";
-import { AiOutlineReload } from "react-icons/ai";
 import { SandboxBackground } from "./ChatBackground";
 import { Messages } from "./Messages";
+import { OCanvas } from "../canvas/OCanvas";
 
 export const ChatArea = () => {
-  const user = useUserStore();
-
   return (
     <div className="w-full h-full">
       <Messages />
+      <OCanvas className="z-10 select-none" />
       <SandboxBackground />
     </div>
   );

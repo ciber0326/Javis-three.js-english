@@ -44,7 +44,7 @@ export const Messages = () => {
   };
 
   return (
-    <div className="absolute z-10 top-32 left-0 w-full h-3/4 mx-auto">
+    <div className="absolute z-20 top-32 left-0 w-full mx-auto">
       <MainContainer>
         <MessageContainer>
           {/* <MessageHeader showBack={false}/> */}

@@ -10,10 +10,14 @@ body {
 }
 
 #MessageList {
-  height:inherit;
+  height: inherit;
 }
 
 #MessageList div {
   height: inherit;
   background-color: transparent;
+}
+
+#message-list {
+  scrollbar-width: thin;
 }

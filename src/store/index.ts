@@ -117,6 +117,42 @@ const useMessageStore = create<MessageStore>((set) => ({
       message: "Hello",
       messagedAt: new Date(),
     },
+    {
+      id: "4",
+      role: "user",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "5",
+      role: "user",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "6",
+      role: "assistant",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "7",
+      role: "user",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "8",
+      role: "user",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
+    {
+      id: "9",
+      role: "assistant",
+      message: "Hello",
+      messagedAt: new Date(),
+    },
   ],
   addMessage: (message) =>
     set((state) => ({

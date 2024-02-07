@@ -1,20 +1,13 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, Suspense, useState } from "react";
 import {
   Animator,
   type AnimatorGeneralProviderSettings,
   AnimatorGeneralProvider,
-  BleepsOnAnimator,
   type BleepsProviderSettings,
   BleepsProvider,
-  Animated,
-  FrameSVGCorners,
-  aa,
-  aaVisibility,
-  useBleeps,
   createAppTheme,
   createAppStylesBaseline,
-
-  Text
+  Text,
 } from "@arwes/react";
 import { type CSSObject, Global } from "@emotion/react";
 
@@ -62,11 +55,62 @@ export const ArwesProvider = ({ children }: ArwesProviderProps) => {
       <Global styles={stylesBaseline as Record<string, CSSObject>} />
       <AnimatorGeneralProvider {...animatorsSettings}>
         <BleepsProvider {...bleepsSettings}>
-          <Animator active={true} combine manager="stagger">
-            {children}
-          </Animator>
+          <StartScreen>
+            <Suspense>
+              <Animator active={true} combine manager="stagger">
+                {children}
+              </Animator>
+            </Suspense>
+          </StartScreen>
         </BleepsProvider>
       </AnimatorGeneralProvider>
+    </>
+  );
+};
+
+type StartScreenProps = {
+  children: React.ReactNode;
+};
+const StartScreen = (
+  props: StartScreenProps
+): ReactElement<StartScreenProps> => {
+  const { children } = props;
+  const [show, setShow] = useState(false);
+
+  const onStart = () => {
+    setShow(true);
+  };
+
+  return (
+    <>
+      {show ? (
+        children
+      ) : (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "black",
+            color: "white",
+            fontSize: "24px",
+          }}
+        >
+          {/** StartButton */}
+          <div>
+            <button onClick={onStart}>
+              <Text as="span" style={{ fontSize: "24px" }}>
+                Start
+              </Text>
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

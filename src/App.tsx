@@ -6,7 +6,6 @@ import { ModalProvider } from "./providers/ModalProvider";
 import { Header } from "./parts/Header";
 import { ChatArea } from "./parts/ChatArea";
 import { TalkProvider } from "./providers/TalkProvider";
-import { Footer } from "./parts/Footer";
 
 export const App = () => {
   return (
@@ -16,7 +15,6 @@ export const App = () => {
           <TalkProvider>
             <Header />
             <ChatArea />
-            <Footer />
           </TalkProvider>
         </ModalProvider>
       </ArwesProvider>

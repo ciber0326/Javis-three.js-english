@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import type { MessageProps } from "../../store";
 import {
   Animated,
@@ -33,18 +33,24 @@ export const MessageList = ({
   }, [messages]);
 
   return (
-    <Animated ref={ref} className="card w-full max-h-full px-3">
-      {/* {loading && <div>Loading...</div>} */}
-      {messages.map((message) => (
-        <div className="grid grid-cols-3 gap-4">
-          {message.role === "user" && (
-            <div className="col-span-1 md:col-span-2"></div>
-          )}
-          <div className="col-span-2 md:col-span-1">
-            <Message message={message} key={message.id} />
+    <Animated className="card w-full px-3">
+      <div
+        ref={ref}
+        id="message-list"
+        className="max-h-[calc(100vh_-_130px)] overflow-y-auto"
+      >
+        {/* {loading && <div>Loading...</div>} */}
+        {messages.map((message) => (
+          <div className="grid grid-cols-3 gap-4">
+            {message.role === "user" && (
+              <div className="col-span-1 md:col-span-2"></div>
+            )}
+            <div className="col-span-2 md:col-span-1">
+              <Message message={message} key={message.id} />
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </Animated>
   );
 };
