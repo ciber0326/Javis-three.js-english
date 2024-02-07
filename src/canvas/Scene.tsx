@@ -1,5 +1,4 @@
 import React from "react";
-import { OrbitControls } from "@react-three/drei";
 import { CameraRig } from "./CameraRig";
 import { Effects } from "./Effects";
 import { ArcReactor } from "./ArcReactor";
