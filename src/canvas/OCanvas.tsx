@@ -1,11 +1,12 @@
-import React, { lazy } from "react";
-import { Canvas } from "@react-three/offscreen";
+import React from "react";
+import { Canvas } from "@react-three/fiber";
+import Scene from "./Scene";
 
-const Scene = lazy(() => import("./Scene"));
+// const Scene = lazy(() => import("./Scene"));
 
-const worker = new Worker(new URL("./worker.jsx", import.meta.url), {
-  type: "module",
-});
+// const worker = new Worker(new URL("./worker.jsx", import.meta.url), {
+//   type: "module",
+// });
 
 type OCanvasProps = {
   className?: string;
@@ -24,11 +25,11 @@ export const OCanvas = ({ className }: OCanvasProps) => {
     >
       <Canvas
         camera={{ position: [0, 0, 5], fov: 52 }}
-        worker={worker}
-        fallback={<Scene />}
         // transparent
         gl={{ alpha: true }}
-      ></Canvas>
+      >
+        <Scene />
+      </Canvas>
     </div>
   );
 };

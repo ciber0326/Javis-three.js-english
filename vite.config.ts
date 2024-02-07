@@ -7,8 +7,6 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   plugins: [
     VitePWA(),
-    // @ts-ignore
-    // react({ fastRefresh: false }),
     react(),
     glsl({
       include: [
@@ -27,9 +25,6 @@ export default defineConfig({
       root: "/", // Directory for root imports
     }),
   ],
-  worker: {
-    plugins: [react()],
-  },
   define: {
     "process.env": process.env,
   },
