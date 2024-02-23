@@ -5,8 +5,8 @@ import Lenis from "@studio-freight/lenis";
 import { CameraRig } from "../canvas/CameraRig";
 
 // LenisでSmoothなScroll
-const lenis = new Lenis({ syncTouch: true });
-addEffect((t) => lenis.raf(t));
+// const lenis = new Lenis({ syncTouch: true });
+// addEffect((t) => lenis.raf(t));
 
 interface SceneProps extends CanvasProps {
   style?: React.CSSProperties;
