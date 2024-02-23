@@ -41,6 +41,9 @@ dependencies:
   '@react-three/postprocessing':
     specifier: ^2.15.8
     version: 2.15.12(@react-three/fiber@8.15.16)(@types/three@0.160.0)(react@18.2.0)(three@0.160.1)
+  '@studio-freight/lenis':
+    specifier: ^1.0.34
+    version: 1.0.34
   axios:
     specifier: ^1.3.4
     version: 1.6.7
@@ -2436,6 +2439,10 @@ packages:
       react: '>= 16.3.0'
     dependencies:
       react: 18.2.0
+    dev: false
+
+  /@studio-freight/lenis@1.0.34:
+    resolution: {integrity: sha512-sEyzEjfAsTlFgDebMYT5G7tlB0ZHhWkHEoJj0g7W0YYZO093Mh4MU65o1qbNKwRacspdU04ZrA+5Wxwt4dsS7Q==}
     dev: false
 
   /@surma/rollup-plugin-off-main-thread@2.2.3:

@@ -14,14 +14,14 @@ import { FaKey } from "react-icons/fa";
 import { BsFillMicFill, BsFillMicMuteFill } from "react-icons/bs";
 import { useColorStore, useUserStore } from "../store";
 import { useTalk } from "../providers/TalkProvider";
+import { useModal } from "../providers/ModalProvider";
 
 const theme = createAppTheme();
 
 export const Header = () => {
-  const [active, setActive] = useState(false);
   const user = useUserStore();
   const { color, foreColor } = useColorStore();
-  const [open, setOpen] = useState(false);
+  const { alertModal } = useModal();
   const bleeps = useBleeps();
 
   const { openLinkDesciption, startSpeech } = useTalk();
@@ -35,7 +35,7 @@ export const Header = () => {
   };
 
   return (
-    <div className="z-30 fixed top-4 w-full">
+    <div className="z-30 fixed top-4 left-0 w-full">
       <Animator>
         <BleepsOnAnimator transitions={{ entering: "intro" }} continuous />
         <Animated
@@ -109,35 +109,69 @@ export const Header = () => {
               cursor: "pointer",
             }}
           >
-            <a onClick={() => setOpen(!open)}>
+            <a
+              onClick={() => {
+                alertModal({
+                  title: "APIキーが設定されていません",
+                  confirmText: "OK",
+                  cancelText: "Cancel",
+                  // content: <></>,
+                  content: (
+                    <input
+                      type="password"
+                      placeholder="OpenAIのAPIキーをここに入力してください。"
+                      value={user.openaiApiKey}
+                      onChange={(e) => {
+                        user.setOpenaiApiKey(e.target.value);
+                        // 音も鳴らす
+                        bleeps.click?.play();
+                      }}
+                      style={{
+                        backgroundColor: foreColor,
+                        position: "absolute",
+                        top: "85px",
+                        zIndex: 2,
+                      }}
+                    />
+                  ),
+                });
+              }}
+            >
               <FaKey />
             </a>
           </div>
         </Animated>
-        <Animator active={open} duration={{ enter: 0.75 }}>
-          {open && (
-            <input
-              type="password"
-              placeholder="OpenAIのAPIキーをここに入力してください。"
-              value={user.openaiApiKey}
-              onChange={(e) => {
-                user.setOpenaiApiKey(e.target.value);
-                // 音も鳴らす
-                bleeps.click?.play();
-              }}
-              style={{
-                backgroundColor: foreColor,
-                position: "absolute",
-                top: "85px",
-                zIndex: 2,
-                // width: "90%",
-                // margin: "0 auto",
-              }}
-            />
-          )}
-        </Animator>
         {/* </Animator> */}
       </Animator>
     </div>
+  );
+};
+
+const KeyInputModal = () => {
+  const user = useUserStore();
+  const { foreColor } = useColorStore();
+  const bleeps = useBleeps();
+
+  return (
+    <Animator duration={{ enter: 0.75 }}>
+      <input
+        type="password"
+        placeholder="OpenAIのAPIキーをここに入力してください。"
+        value={user.openaiApiKey}
+        onChange={(e) => {
+          user.setOpenaiApiKey(e.target.value);
+          // 音も鳴らす
+          bleeps.click?.play();
+        }}
+        style={{
+          backgroundColor: foreColor,
+          position: "absolute",
+          top: "85px",
+          zIndex: 2,
+          // width: "90%",
+          // margin: "0 auto",
+        }}
+      />
+    </Animator>
   );
 };

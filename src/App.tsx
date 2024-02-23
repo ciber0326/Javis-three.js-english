@@ -6,10 +6,11 @@ import { ModalProvider } from "./providers/ModalProvider";
 import { Header } from "./parts/Header";
 import { ChatArea } from "./parts/ChatArea";
 import { TalkProvider } from "./providers/TalkProvider";
+import { Scene } from "./providers/scene";
 
 export const App = () => {
   return (
-    <div className="App">
+    <div className="App" id="jarvis">
       <ArwesProvider>
         <ModalProvider>
           <TalkProvider>
@@ -18,6 +19,7 @@ export const App = () => {
           </TalkProvider>
         </ModalProvider>
       </ArwesProvider>
+      <Scene children={undefined} />
     </div>
   );
 };

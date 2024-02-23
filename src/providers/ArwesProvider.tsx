@@ -7,9 +7,14 @@ import {
   BleepsProvider,
   createAppTheme,
   createAppStylesBaseline,
-  Text,
 } from "@arwes/react";
 import { type CSSObject, Global } from "@emotion/react";
+import { HomeShader } from "../canvas/HomeShader";
+import SceneItems from "../canvas/SceneItems";
+import { StartButton } from "../canvas/StartButton";
+import { CameraRig } from "../canvas/CameraRig";
+import { SoftShadows } from "@react-three/drei";
+import { PointerLight } from "../canvas/PointerLight";
 
 const theme = createAppTheme();
 const stylesBaseline = createAppStylesBaseline(theme);
@@ -83,34 +88,39 @@ const StartScreen = (
 
   return (
     <>
-      {show ? (
-        children
-      ) : (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            background: "black",
-            color: "white",
-            fontSize: "24px",
-          }}
-        >
-          {/** StartButton */}
-          <div>
-            <button onClick={onStart}>
-              <Text as="span" style={{ fontSize: "24px" }}>
-                Start
-              </Text>
-            </button>
-          </div>
-        </div>
-      )}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 999,
+        }}
+      >
+        {show ? (
+          <>
+            <div>{children}</div>
+            <SceneItems />
+          </>
+        ) : (
+          <>
+            {/** StartButton */}
+            <HomeShader>
+              <StartButton onClick={onStart} />
+              <CameraRig />
+              <PointerLight />
+              <fog attach="fog" args={["black", 0, 14]} />
+              <pointLight position={[10, -10, -20]} intensity={10} />
+              <pointLight position={[-10, -10, -20]} intensity={10} />
+              <SoftShadows samples={3} />
+            </HomeShader>
+          </>
+        )}
+      </div>
     </>
   );
 };
