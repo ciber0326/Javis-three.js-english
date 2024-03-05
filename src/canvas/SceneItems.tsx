@@ -1,5 +1,4 @@
-import React, { lazy, Suspense } from "react";
-import { CameraRig } from "./CameraRig";
+import React, { lazy, Suspense, memo } from "react";
 import { Effects } from "./Effects";
 import { ArcReactor } from "./ArcReactor";
 
@@ -7,7 +6,7 @@ const View = lazy(() =>
   import("@react-three/drei").then((module) => ({ default: module.View }))
 );
 
-export default function Scene() {
+function Scene() {
   return (
     <Suspense fallback={null}>
       {/** @ts-ignore */}
@@ -19,3 +18,5 @@ export default function Scene() {
     </Suspense>
   );
 }
+
+export const SceneView =  memo(Scene);

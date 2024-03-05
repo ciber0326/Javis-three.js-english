@@ -1,4 +1,4 @@
-import React, { ReactElement, Suspense, useState } from "react";
+import React, { ReactElement, Suspense, useEffect, useState } from "react";
 import {
   Animator,
   type AnimatorGeneralProviderSettings,
@@ -10,11 +10,12 @@ import {
 } from "@arwes/react";
 import { type CSSObject, Global } from "@emotion/react";
 import { HomeShader } from "../canvas/HomeShader";
-import SceneItems from "../canvas/SceneItems";
+import { SceneView } from "../canvas/SceneItems";
 import { StartButton } from "../canvas/StartButton";
 import { CameraRig } from "../canvas/CameraRig";
-import { SoftShadows } from "@react-three/drei";
 import { PointerLight } from "../canvas/PointerLight";
+import { Effects } from "../canvas/Effects";
+import { useUserStore } from "../store";
 
 const theme = createAppTheme();
 const stylesBaseline = createAppStylesBaseline(theme);
@@ -55,6 +56,10 @@ type ArwesProviderProps = {
   children: React.ReactNode;
 };
 export const ArwesProvider = ({ children }: ArwesProviderProps) => {
+  const user = useUserStore();
+  useEffect(() => {
+    user.getLocalStorageKey();
+  }, []);
   return (
     <>
       <Global styles={stylesBaseline as Record<string, CSSObject>} />
@@ -62,9 +67,9 @@ export const ArwesProvider = ({ children }: ArwesProviderProps) => {
         <BleepsProvider {...bleepsSettings}>
           <StartScreen>
             <Suspense>
-              <Animator active={true} combine manager="stagger">
+              {/* <Animator active={true} combine manager="stagger"> */}
                 {children}
-              </Animator>
+              {/* </Animator> */}
             </Suspense>
           </StartScreen>
         </BleepsProvider>
@@ -104,19 +109,19 @@ const StartScreen = (
         {show ? (
           <>
             <div>{children}</div>
-            <SceneItems />
+            <SceneView />
           </>
         ) : (
           <>
             {/** StartButton */}
             <HomeShader>
               <StartButton onClick={onStart} />
+              <Effects />
               <CameraRig />
               <PointerLight />
               <fog attach="fog" args={["black", 0, 14]} />
               <pointLight position={[10, -10, -20]} intensity={10} />
               <pointLight position={[-10, -10, -20]} intensity={10} />
-              <SoftShadows samples={3} />
             </HomeShader>
           </>
         )}

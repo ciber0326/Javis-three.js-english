@@ -1,12 +1,10 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 
-import { Global } from "@emotion/react";
 import {
   type AppTheme,
   createAppTheme,
   Animator,
   Text,
-  Animated,
   FrameSVGKranox,
 } from "@arwes/react";
 import { useColorStore, useModalStore } from "../store";
@@ -30,6 +28,8 @@ type ModalProps = {
   title?: string;
   confirmText?: string;
   cancelText?: string;
+  okFunc?: () => void;
+  cancelFunc?: () => void;
 };
 const Modal = ({
   open,
@@ -37,6 +37,8 @@ const Modal = ({
   title,
   confirmText="OK",
   cancelText="Cancel",
+  okFunc,
+  cancelFunc,
 }: ModalProps) => {
   const { color, foreColor } = useColorStore();
   const { hiddenModal } = useModalStore();
@@ -45,7 +47,7 @@ const Modal = ({
     <>
       <style>{`
               .modal .arwes-react-frames-framesvg [data-name=bg] {
-                color: #2C2C0640;
+                color: #2C2C0688;
               }
               .modal .arwes-react-frames-framesvg [data-name=line] {
                 color: #DFDF1F;
@@ -66,7 +68,7 @@ const Modal = ({
         <Animator active={open}>
           <div
             id="modal-dialog"
-            className="modal relative w-1/2 top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
+            className="modal relative w-full md:w-1/2 top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
           >
             <div className="relative">
               <FrameSVGKranox
@@ -77,7 +79,7 @@ const Modal = ({
                 largeLineLength={48}
               ></FrameSVGKranox>
 
-              <div className="px-12 pt-6">
+              <div className="px-12 pt-6 w-full">
                 {title &&
                   <Text as="h2" manager="decipher" easing="outSine" fixed>
                     {title}
@@ -99,7 +101,10 @@ const Modal = ({
                     color: color,
                     border: `1px solid ${color}`,
                   }}
-                  onClick={() => hiddenModal()}
+                  onClick={() => {
+                    hiddenModal();
+                    okFunc && okFunc();
+                  }}
                 >
                   {confirmText}
                 </button>
@@ -110,7 +115,10 @@ const Modal = ({
                     color: "#DFDF1F",
                     border: `1px solid #DFDF1F`,
                   }}
-                  onClick={() => hiddenModal()}
+                  onClick={() => {
+                    hiddenModal();
+                    cancelFunc && cancelFunc();
+                  }}
                 >
                   {cancelText}
                 </button>
@@ -128,6 +136,8 @@ type AlertModalProps = {
   confirmText: string;
   cancelText: string;
   content: React.ReactNode;
+  okFunc?: () => void;
+  cancelFunc?: () => void;
 };
 const ModalContext = React.createContext({
   alertModal: (props: AlertModalProps) => {},
@@ -142,13 +152,20 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const [title, setTitle] = React.useState("");
   const [confirmText, setConfirmText] = React.useState("");
   const [cancelText, setCancelText] = React.useState("");
+  // refで実装
+  const _okFunc = React.useRef<() => void>();
+  const _cancelFunc = React.useRef<() => void>();
 
   const alertModal = ({
     title,
     confirmText,
     cancelText,
     content,
+    okFunc,
+    cancelFunc,
   }: AlertModalProps) => {
+    _okFunc.current = okFunc;
+    _cancelFunc.current = cancelFunc;
     setContent(content);
     setTitle(title);
     setConfirmText(confirmText);
@@ -168,6 +185,8 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
         title={title}
         confirmText={confirmText}
         cancelText={cancelText}
+        okFunc={_okFunc.current}
+        cancelFunc={_cancelFunc.current}
       >
         {content}
       </Modal>

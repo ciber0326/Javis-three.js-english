@@ -1,6 +1,10 @@
-import React from "react";
-import { useColorStore, useMessageStore, useUserStore } from "../store";
-import { MySwal } from "../utils/alert";
+import React, { useEffect, useRef } from "react";
+import {
+  MessageProps,
+  useColorStore,
+  useMessageStore,
+  useUserStore,
+} from "../store";
 import { requestChatGPT } from "../services/chatBotApi";
 import { playTextToSpeech } from "../hooks/useTextToSpeech";
 import { useTalk } from "../providers/TalkProvider";
@@ -8,40 +12,122 @@ import { MainContainer } from "./Message/MainContainer";
 import { MessageContainer } from "./Message/MessageContainer";
 import { MessageList } from "./Message/MessageList";
 import { useModal } from "../providers/ModalProvider";
+import { useBleeps } from "@arwes/react";
+import { parseJsonGpt } from "../utils/gpts";
 
 export const Messages = () => {
   const user = useUserStore();
-  const { finishText } = useTalk();
+  const currentInput = useRef("");
+  const { speechText, logs, err } = useTalk();
+  const { addMessage } = useMessageStore();
   const { alertModal } = useModal();
+  const { foreColor } = useColorStore();
+  const bleeps = useBleeps();
 
   const appendChatBoxText = async () => {
-    if (user.openaiApiKey && user.openaiApiKey.length < 16) {
+    if (err.current) {
+      return;
+    }
+    if (!user.openaiApiKey) {
       alertModal({
-        title: "APIキーが設定されていません",
+        title: "APIキーの設定",
         confirmText: "OK",
         cancelText: "Cancel",
         content: (
-          <div>
-            OpenAIの
-            <a href="https://platform.openai.com/account/api-keys">APIページ</a>
-            よりAPIキーを入手してください。
+          <div className="w-full p-4">
+            <div className="mb-3">
+              <a
+                href="https://platform.openai.com/account/api-keys"
+                target="_blank"
+              >
+                OpenAIのAPIページ
+              </a>
+            </div>
+            <input
+              type="password"
+              placeholder="OpenAIのAPIキーをここに入力してください。"
+              // value={user.openaiApiKey}
+              className="w-full block text-white text-sm font-bold p-2 rounded-sm outline-none"
+              onChange={(e) => {
+                // 音も鳴らす
+                bleeps.click?.play();
+                user.setOpenaiApiKey(e.target.value);
+              }}
+              style={{
+                backgroundColor: foreColor,
+              }}
+            />
           </div>
         ),
+        okFunc: () => {
+          err.current = false;
+          user.saveLocalStorageKey(user.openaiApiKey);
+        },
       });
-    }
-    if (!finishText.current || finishText.current.length <= 2) {
+      err.current = true;
       return;
     }
+    if (
+      !speechText.current.finishText ||
+      speechText.current.finishText.length <= 2
+    ) {
+      return;
+    }
+    // すでに同じテキストが入力されていたら何もしない
+    if (currentInput.current === speechText.current.finishText) {
+      return;
+    }
+    currentInput.current = speechText.current.finishText;
+    const usersend = {
+      id: speechText.current.finishText,
+      role: "user",
+      message: speechText.current.finishText,
+      messagedAt: new Date(),
+    } as MessageProps;
+    addMessage(usersend);
+    bleeps.click?.play();
     const chatbotText = await requestChatGPT({
-      text: finishText.current,
+      text: speechText.current.finishText,
       apiKey: user.openaiApiKey,
+      system: user.system,
+      hisotries: logs.current,
     });
+    if (!chatbotText) {
+      err.current = true;
+      return;
+    }
+    const res = parseJsonGpt(chatbotText);
+    if (!res) {
+      return;
+    }
+    const assistantsend = {
+      id: res.id,
+      role: "assistant",
+      message: res.jarvis,
+      messagedAt: new Date(),
+      jp: res.jp,
+      words: res.words,
+      words_jp: res.words_jp,
+    } as MessageProps;
+    addMessage(assistantsend);
+    logs.current.push(usersend);
+    logs.current.push(assistantsend);
+    bleeps.click?.play();
     playTextToSpeech({
-      text: chatbotText,
+      text: res.jarvis,
       lang: "Auto",
       speed: user.talkSpeed,
     });
   };
+
+  useEffect(() => {
+    // 1秒毎に確認する
+    const update = () => {
+      appendChatBoxText();
+    };
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [speechText, user.openaiApiKey]);
 
   return (
     <div className="absolute z-20 top-32 left-0 w-full mx-auto">
@@ -57,7 +143,7 @@ export const Messages = () => {
 
 const MessageListComponent = () => {
   const color = useColorStore((state) => state.color);
-  const messages = useMessageStore((state) => state.messages);
+  const { messages } = useMessageStore();
 
   return (
     <MessageList

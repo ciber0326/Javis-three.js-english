@@ -19,18 +19,19 @@ import { useModal } from "../providers/ModalProvider";
 const theme = createAppTheme();
 
 export const Header = () => {
-  const user = useUserStore();
+  const { saveLocalStorageKey, setLanguage, language, mic, openaiApiKey, setOpenaiApiKey } = useUserStore();
   const { color, foreColor } = useColorStore();
+  const { err } = useTalk();
   const { alertModal } = useModal();
   const bleeps = useBleeps();
 
   const { openLinkDesciption, startSpeech } = useTalk();
 
   const changeLang = () => {
-    if (user.language === "en-US") {
-      user.setLanguage("ja-JP");
+    if (language === "en-US") {
+      setLanguage("ja-JP");
     } else {
-      user.setLanguage("en-US");
+      setLanguage("en-US");
     }
   };
 
@@ -83,7 +84,7 @@ export const Header = () => {
             }}
           >
             <a onClick={() => startSpeech()}>
-              {user.mic ? <BsFillMicFill /> : <BsFillMicMuteFill />}
+              {mic ? <BsFillMicFill /> : <BsFillMicMuteFill />}
             </a>
           </div>
           <div
@@ -96,7 +97,7 @@ export const Header = () => {
             }}
           >
             <a onClick={() => changeLang()}>
-              {user.language === "en-US" ? "JP" : "US"}
+              {language === "en-US" ? "US" : "JP"}
             </a>
           </div>
           <div
@@ -112,28 +113,34 @@ export const Header = () => {
             <a
               onClick={() => {
                 alertModal({
-                  title: "APIキーが設定されていません",
+                  title: "APIキーの設定",
                   confirmText: "OK",
                   cancelText: "Cancel",
-                  // content: <></>,
-                  content: (
-                    <input
-                      type="password"
-                      placeholder="OpenAIのAPIキーをここに入力してください。"
-                      value={user.openaiApiKey}
-                      onChange={(e) => {
-                        user.setOpenaiApiKey(e.target.value);
-                        // 音も鳴らす
-                        bleeps.click?.play();
-                      }}
-                      style={{
-                        backgroundColor: foreColor,
-                        position: "absolute",
-                        top: "85px",
-                        zIndex: 2,
-                      }}
-                    />
+                  content: ( 
+                    <div className="w-full p-4">
+                      <div className="mb-3">
+                        <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAIのAPIページ</a>
+                      </div>
+                      <input
+                        type="password"
+                        placeholder="OpenAIのAPIキーをここに入力してください。"
+                        // value={openaiApiKey}
+                        className="w-full block text-white text-sm font-bold p-2 rounded-sm outline-none"
+                        onChange={(e) => {
+                          // 音も鳴らす
+                          bleeps.click?.play();
+                          setOpenaiApiKey(openaiApiKey);
+                        }}
+                        style={{
+                          backgroundColor: foreColor,
+                        }}
+                      />
+                    </div>
                   ),
+                  okFunc: () => {
+                    err.current = false;
+                    saveLocalStorageKey(openaiApiKey);
+                  },
                 });
               }}
             >
@@ -144,34 +151,5 @@ export const Header = () => {
         {/* </Animator> */}
       </Animator>
     </div>
-  );
-};
-
-const KeyInputModal = () => {
-  const user = useUserStore();
-  const { foreColor } = useColorStore();
-  const bleeps = useBleeps();
-
-  return (
-    <Animator duration={{ enter: 0.75 }}>
-      <input
-        type="password"
-        placeholder="OpenAIのAPIキーをここに入力してください。"
-        value={user.openaiApiKey}
-        onChange={(e) => {
-          user.setOpenaiApiKey(e.target.value);
-          // 音も鳴らす
-          bleeps.click?.play();
-        }}
-        style={{
-          backgroundColor: foreColor,
-          position: "absolute",
-          top: "85px",
-          zIndex: 2,
-          // width: "90%",
-          // margin: "0 auto",
-        }}
-      />
-    </Animator>
   );
 };

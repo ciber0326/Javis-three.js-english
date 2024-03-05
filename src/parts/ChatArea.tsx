@@ -2,7 +2,6 @@ import React, { lazy, Suspense } from "react";
 import { SandboxBackground } from "./ChatBackground";
 import { Messages } from "./Messages";
 // import { View } from "@react-three/drei";
-import SceneItems from "../canvas/SceneItems";
 
 const View = lazy(() =>
   import("@react-three/drei").then((module) => ({ default: module.View }))

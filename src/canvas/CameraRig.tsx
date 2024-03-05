@@ -9,7 +9,7 @@ type CameraRigProps = {
   yRange?: number;
 };
 export const CameraRig = (
-  { xRange = 0.1, yRange = 0.1 }: CameraRigProps
+  { xRange = 0.02, yRange = 0.02 }: CameraRigProps
 ) => {
   const { camera } = useThree();
   dumpVec3.copy(camera.position.clone())

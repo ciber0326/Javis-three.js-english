@@ -21,7 +21,14 @@ const maxLen = 500;
  * 特定の文字をしゃべらせる
  * @param props 
  */
-export const playTextToSpeech = (props: ITextToSpeech): Promise<void> => {
+export const playTextToSpeech = ({
+  text,
+  lang = "Auto",
+  speed = 1.0,
+  pitch = 1.0,
+  volume = 0.8,
+  voiceName = "",
+}: ITextToSpeech): Promise<void> => {
   if (!utterance) {
     try {
       utterance = new SpeechSynthesisUtterance();
@@ -33,25 +40,25 @@ export const playTextToSpeech = (props: ITextToSpeech): Promise<void> => {
     utterance = new SpeechSynthesisUtterance();
   }
   return new Promise((resolve) => {
-    utterance.text = props.text.length > maxLen ? props.text.substring(0, maxLen - 1) : props.text;
-    if (props.lang == "Auto" || !props.lang) {
-      utterance.lang = detectLanguage(props.text);
+    utterance.text = text.length > maxLen ? text.substring(0, maxLen - 1) : text;
+    if (lang == "Auto" || !lang) {
+      utterance.lang = detectLanguage(text);
     } else {
-      utterance.lang = props.lang ;
+      utterance.lang = lang ;
     }
-    utterance.rate = props.speed ? props.speed : 1;
-    if (props.voiceName) {
+    utterance.rate = speed ? speed : 1;
+    if (voiceName) {
       if (
         window.speechSynthesis.getVoices().find(
-          (voice) => voice.name === props.voiceName)
+          (voice) => voice.name === voiceName)
       ) {
         utterance.voice = window.speechSynthesis.getVoices().find(
-          (voice) => voice.name === props.voiceName
+          (voice) => voice.name === voiceName
         ) as SpeechSynthesisVoice;
       }
     }
-    utterance.pitch = (props.pitch) ? props.pitch : 1.0;
-    utterance.volume = (props.volume) ? props.volume : 0.8;
+    utterance.pitch = (pitch) ? pitch : 1.0;
+    utterance.volume = (volume) ? volume : 0.8;
 
     // Resolve the promise when the speech ends
     utterance.onend = () => {

@@ -28,7 +28,6 @@ export const Scene = ({ style, ...props }: SceneProps) => {
       eventPrefix="client"
       {...props}
     >
-      <CameraRig />
       <Preload all />
       <View.Port />
     </Canvas>

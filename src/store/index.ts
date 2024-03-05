@@ -19,11 +19,14 @@ import { create } from "zustand";
  * マイク状態 / 言語 / OpenAI API Key
  */
 type language = "ja-JP" | "en-US";
+type level = "easy" | "normal" | "hard";
 type UserStore = {
   mic: boolean;
   language: language;
   openaiApiKey: string;
   talkSpeed: number;
+  level: level;
+  system: string;
   setMic: (mic: boolean) => void;
   setLanguage: (language: language) => void;
   setOpenaiApiKey: (openaiApiKey: string) => void;
@@ -33,9 +36,30 @@ type UserStore = {
 };
 const useUserStore = create<UserStore>((set) => ({
   mic: false,
-  language: "ja-JP",
+  language: "en-US",
   openaiApiKey: "",
   talkSpeed: 1,
+  level: "normal",
+  system: `
+   これから私たちは英会話のシミュレーションを行います。
+   あなたの名前はJARVISです。
+   毎回返答として必ず以下のJSON形式で返してください。
+   {
+    "jarvis": "<ここにあなたの英会話の返答>",
+    "jp": "<ここにあなたの返答の日本語訳>",
+    "words": [
+      "<ここにあなたの返答に使った単語>",
+      "<ここにあなたの返答に使った単語>",
+      "<ここにあなたの返答に使った単語>"
+    ],
+    "words_jp": [
+      "<ここにあなたの返答に使った単語の日本語訳>",
+      "<ここにあなたの返答に使った単語の日本語訳>",
+      "<ここにあなたの返答に使った単語の日本語訳>"
+    ],
+   }
+   注意点としてwordsおよびwords_jpは3つまでとしてください。
+  `,
   setMic: (mic) => set({ mic }),
   setLanguage: (language) => set({ language }),
   setOpenaiApiKey: (openaiApiKey) => set({ openaiApiKey }),
@@ -90,6 +114,9 @@ export type MessageProps = {
   username?: string;
   avatar?: string;
   messagedAt: Date;
+  jp?: string;
+  words?: string[];
+  words_jp?: string[];
 };
 type MessageStore = {
   messages: MessageProps[];
@@ -98,44 +125,7 @@ type MessageStore = {
   removeAllMessages: () => void;
 };
 const useMessageStore = create<MessageStore>((set) => ({
-  messages: [
-    {
-      id: "1",
-      role: "user",
-      message: "Hello, how are you today?",
-      messagedAt: new Date(),
-    },
-    {
-      id: "2",
-      role: "assistant",
-      message: "I'm just a program, but I'm doing great, thanks for asking! What plans do you have for today?",
-      messagedAt: new Date(),
-    },
-    {
-      id: "3",
-      role: "user",
-      message: "I plan to study English for a few hours.",
-      messagedAt: new Date(),
-    },
-    {
-      id: "4",
-      role: "assistant",
-      message: "That sounds productive! I'll be joining a friend for coffee later.",
-      messagedAt: new Date(),
-    },
-    {
-      id: "5",
-      role: "user",
-      message: "I definitely will. I'm trying to improve my speaking skills.",
-      messagedAt: new Date(),
-    },
-    {
-      id: "6",
-      role: "assistant",
-      message: "It's normal to find speaking challenging at first. Practice is key, and conversations like this one are a great way to improve. Keep up the good work!",
-      messagedAt: new Date(),
-    },
-  ],
+  messages: [],
   addMessage: (message) =>
     set((state) => ({
       messages: [...state.messages, message],

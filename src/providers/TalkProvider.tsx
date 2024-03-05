@@ -1,23 +1,24 @@
-import React, { useContext, createContext, useRef } from "react";
+import React, { useContext, createContext, useRef, useEffect } from "react";
 import { MySwal } from "../utils/alert";
-import { useUserStore } from "../store";
-import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
+import { MessageProps, useUserStore } from "../store";
+import { useSpeechRecognition, type SpeechRecognitionResultProps } from "../hooks/useSpeechRecognition";
 
 export const TalkContext = createContext({
   openLinkDesciption: () => {},
   startReload: () => {},
   startSpeech: () => {},
-  finishText: {
-    current: "",
-  },
+  logs: { current: [] } as React.MutableRefObject<MessageProps[]>,
+  err: { current: false } as React.MutableRefObject<boolean>,
+  speechText: { current: {} } as React.MutableRefObject<SpeechRecognitionResultProps>,
 });
 
 type TalkProviderProps = {
   children: React.ReactNode;
 };
 export const TalkProvider = ({ children }: TalkProviderProps) => {
-  const finishText = useRef("");
   const user = useUserStore();
+  const logs = useRef<MessageProps[]>([]);
+  const err = useRef(false);
 
   const speechText = useSpeechRecognition({
     enabled: user.mic,
@@ -76,13 +77,19 @@ export const TalkProvider = ({ children }: TalkProviderProps) => {
     user.setMic(!user.mic);
   };
 
+  useEffect(() => {
+    user.getLocalStorageKey();
+  }, []);
+
   return (
     <TalkContext.Provider
       value={{
         openLinkDesciption,
         startReload,
         startSpeech,
-        finishText,
+        logs,
+        err,
+        speechText,
       }}
     >
       {children}

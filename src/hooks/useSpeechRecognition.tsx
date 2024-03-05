@@ -44,7 +44,7 @@ declare global {
 }
 declare let webkitSpeechRecognition: any;
 
-interface IUseSpeechRecognition {
+export interface IUseSpeechRecognition {
   enabled: boolean;
   lang: "ja-JP" | "en-US";
   continuous: boolean; // 連続的に音声認識
@@ -52,15 +52,16 @@ interface IUseSpeechRecognition {
   threshold_volume?: number; // 音声認識の閾値
 }
 
-interface ISpeechRecognitionResult {
+export type SpeechRecognitionResultProps = {
   prevFinishText: string;
   prevInterimText: string;
   finishText: string;
   interimText: string;
+  isPending: boolean;
   pause: boolean; // 一時停止
 }
 
-interface ISpeechRecognitionOutput {
+export interface ISpeechRecognitionOutput {
   finishText: string;
 }
 
@@ -69,17 +70,15 @@ interface ISpeechRecognitionOutput {
  * @param props 
  * @returns 
  */
-export const useSpeechRecognition = (props: IUseSpeechRecognition): ISpeechRecognitionOutput => {
-  const ref = useRef<ISpeechRecognitionResult>({
+export const useSpeechRecognition = (props: IUseSpeechRecognition): React.MutableRefObject<SpeechRecognitionResultProps> => {
+  const ref = useRef<SpeechRecognitionResultProps>({
     prevFinishText: "",
     prevInterimText: "",
     finishText: '',
     interimText: '',
+    isPending: false,
     pause: false,
   });
-
-  //　最終的なテキスト
-  const [finishText, setFinishText] = useState<string>("");
 
   let recognition: SpeechRecognition;
   if (typeof window !== 'undefined') {
@@ -99,10 +98,11 @@ export const useSpeechRecognition = (props: IUseSpeechRecognition): ISpeechRecog
           if (event.results[i].isFinal) {
             finalTranscript += transcript;
             ref.current.finishText = finalTranscript;
-            setFinishText(finalTranscript);
+            ref.current.isPending = false;
           } else {
             interimTranscript += transcript;
             ref.current.interimText = interimTranscript;
+            ref.current.isPending = true;
           }
         }
       }
@@ -165,7 +165,5 @@ export const useSpeechRecognition = (props: IUseSpeechRecognition): ISpeechRecog
     })
   }, [props.enabled, props.lang]);
 
-  return {
-    finishText: finishText
-  };
+  return ref;
 }

@@ -18,5 +18,5 @@ export const PointerLight = () => {
     }
   });
 
-  return <pointLight ref={ref} intensity={20} />;
+  return <pointLight ref={ref} intensity={20} color={"gold"} />;
 };
